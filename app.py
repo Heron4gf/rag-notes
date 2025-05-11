@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
-from rag import find_docs, add_doc, delete_doc, update_doc
+from vect_db import find_docs, add_doc, delete_doc, update_doc
 from document import Document
 import uuid
 
