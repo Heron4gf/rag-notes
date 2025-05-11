@@ -1,1 +1,0 @@
-The OpenAI Agents SDK is a framework that allows developers to build intelligent applications using AI agents that can perform tasks and make decisions. It simplifies the process of creating multi-agent workflows and integrates various tools to enhance functionality.
