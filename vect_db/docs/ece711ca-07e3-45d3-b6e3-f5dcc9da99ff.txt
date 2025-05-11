@@ -1,0 +1,11 @@
+Make sure you have the necessary libraries:
+
+tkinter (usually comes with Python)
+
+FlagEmbedding (for embedding.py)
+
+numpy (for vect_db.py)
+
+pyperclip (for clipboard_monitor.py): Install using pip install pyperclip.
+
+On Linux, pyperclip also requires xclip or xsel to be installed: sudo apt-get install xclip or sudo apt-get install xsel.

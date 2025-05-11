@@ -1,0 +1,62 @@
+import pyperclip
+import time
+import uuid
+from document import Document
+from vect_db import add_doc, find_docs # Assuming vect_db and document are in the same directory orPYTHONPATH
+
+# Make sure embedding model is available and paths in vect_db are correct
+# This script will initialize its own embedding model instance if not shared
+
+def main():
+    print("Clipboard monitor started. Press Ctrl+C to stop.")
+    print("Copied text will be automatically saved as notes.")
+    
+    try:
+        # Initialize the embedding model once if vect_db.add_doc relies on it being warm
+        # For BGEM3FlagModel, this happens within get_embedding -> model.encode
+        # So, a dummy call might warm it up if necessary, or ensure BGEM3FlagModel is initialized globally in embedding.py
+        # For this setup, direct use of add_doc should be fine.
+        pass
+    except Exception as e:
+        print(f"Error during initial setup (e.g., loading embedding model): {e}")
+        print("Ensure 'BAAI/bge-m3' model can be downloaded or is cached.")
+        return
+
+    last_copied_text = ""
+    try:
+        # Attempt to get initial clipboard content to avoid saving it immediately if it's old
+        last_copied_text = pyperclip.paste()
+    except pyperclip.PyperclipException as e:
+        print(f"Could not access clipboard (is a copy/paste mechanism installed? e.g., xclip or xsel on Linux): {e}")
+        return
+
+
+    while True:
+        try:
+            current_clipboard_text = pyperclip.paste()
+
+            if current_clipboard_text and current_clipboard_text != last_copied_text:
+                print(f"New text copied: '{current_clipboard_text[:50]}...'")
+                
+                # Optional: Check if very similar content already exists to avoid near-duplicates
+                # This would involve a find_docs call and a similarity check here.
+                # For simplicity, we're adding directly.
+
+                doc_id = str(uuid.uuid4())
+                new_document = Document(id=doc_id, content=current_clipboard_text)
+                
+                try:
+                    add_doc(new_document)
+                    print(f"Note saved with ID: {doc_id}")
+                    last_copied_text = current_clipboard_text
+                except Exception as e:
+                    print(f"Error saving note to vector DB: {e}")
+                    # Potentially retry or log error more formally
+
+        except pyperclip.PyperclipException as e:
+            # This can happen if clipboard is not accessible (e.g. on some headless systems or if tool not installed)
+            print(f"Error accessing clipboard: {e}. Retrying in 10s.")
+            time.sleep(8) # Wait a bit longer before next retry
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            # Decide if to b
